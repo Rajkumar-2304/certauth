@@ -22,10 +22,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const API = axios.create({
+// ✅ FIXED: Hardcoded fallback to your Render URL
+export const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL
     ? `${process.env.REACT_APP_API_URL}/api`
-    : '/api'
+    : 'https://certauth.onrender.com/api',  // ← changed from '/api'
+  withCredentials: true,  // ← added for cookies/auth
+  timeout: 30000,         // ← 30s timeout for Render cold starts
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -38,7 +41,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       API.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       API.get('/auth/me')
         .then(r => setUser(r.data.user))
-        .catch(() => { setToken(null); localStorage.removeItem('certauth_token'); })
+        .catch(() => {
+          setToken(null);
+          localStorage.removeItem('certauth_token');
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -91,5 +97,3 @@ export const useAuth = () => {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider');
   return ctx;
 };
-
-export { API };
