@@ -22,13 +22,14 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-// ✅ FIXED: Hardcoded fallback to your Render URL
+// On Netlify: frontend + backend share the same domain → use relative /api
+// For local dev: set REACT_APP_API_URL=http://localhost:5000 in frontend/.env
 export const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL
     ? `${process.env.REACT_APP_API_URL}/api`
-    : 'https://certauth.onrender.com/api',  // ← changed from '/api'
-  withCredentials: true,  // ← added for cookies/auth
-  timeout: 30000,         // ← 30s timeout for Render cold starts
+    : '/api',
+  withCredentials: true,
+  timeout: 30000,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

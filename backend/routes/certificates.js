@@ -10,17 +10,9 @@ const Certificate = require('../models/Certificate');
 const { protect, authorize } = require('../middleware/auth');
 const { sendEmail } = require('../utils/mailer');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../uploads');
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
-});
-
+// Use memoryStorage for serverless compatibility (no writable disk on Netlify)
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['application/pdf', 'application/msword',
@@ -42,9 +34,9 @@ router.post('/issue', protect, authorize('admin', 'institution'), upload.single(
     let documentHash = '';
     let filePath = '';
     if (req.file) {
-      const fileBuffer = fs.readFileSync(req.file.path);
-      documentHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
-      filePath = `/uploads/${req.file.filename}`;
+      // req.file.buffer is available with memoryStorage
+      documentHash = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
+      filePath = ''; // No persistent disk on serverless
     } else {
       const data = JSON.stringify({ studentName, course, institution, certId, timestamp: Date.now() });
       documentHash = crypto.createHash('sha256').update(data).digest('hex');

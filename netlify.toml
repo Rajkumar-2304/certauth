@@ -1,13 +1,28 @@
 [build]
-  base    = "frontend"
-  command = "npm run build"
-  publish = "build"
+  command = "cd frontend && npm install && npm run build"
+  publish = "frontend/build"
 
 [build.environment]
   NODE_VERSION = "18"
 
-# Redirect all routes to index.html for React Router (SPA)
+# Serve the Netlify Function for all /api/* requests
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Serve uploads via function too
+[[redirects]]
+  from   = "/uploads/*"
+  to     = "/.netlify/functions/api/uploads/:splat"
+  status = 200
+
+# React Router — SPA fallback
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
