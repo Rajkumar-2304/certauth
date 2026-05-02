@@ -17,12 +17,11 @@ app.use(rateLimit({
   validate: { xForwardedForHeader: false }
 }));
 
-// ── CORS — same domain on Netlify, keep localhost for dev ────────
+// ── CORS ─────────────────────────────────────────────────────────
+// On Netlify: same domain = no CORS issues for production.
+// CLIENT_URL is still used for QR code verify URLs in certificates.
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL,
-    'http://localhost:3000'
-  ].filter(Boolean),
+  origin: '*',   // same-domain on Netlify; lock down after confirming it works
   credentials: true
 }));
 
@@ -35,7 +34,10 @@ app.use('/api/certificates', require('../../backend/routes/certificates'));
 app.use('/api/verify',       require('../../backend/routes/verify'));
 app.use('/api/analytics',    require('../../backend/routes/analytics'));
 
-// ── MongoDB (cached connection across warm lambda invocations) ───
+// ── Health check ─────────────────────────────────────────────────
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// ── MongoDB (cached connection across warm invocations) ──────────
 let isConnected = false;
 const connectDB = async () => {
   if (isConnected) return;
@@ -48,7 +50,6 @@ const connectDB = async () => {
 const handler = serverless(app);
 
 module.exports.handler = async (event, context) => {
-  // Prevent Lambda from waiting for empty event loop
   context.callbackWaitsForEmptyEventLoop = false;
   await connectDB();
   return handler(event, context);

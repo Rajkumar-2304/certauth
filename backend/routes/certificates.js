@@ -42,7 +42,8 @@ router.post('/issue', protect, authorize('admin', 'institution'), upload.single(
       documentHash = crypto.createHash('sha256').update(data).digest('hex');
     }
 
-    const verifyUrl = `${process.env.CLIENT_URL}/verify/${certId}`;
+    const baseUrl = process.env.CLIENT_URL || '';
+    const verifyUrl = `${baseUrl}/verify/${certId}`;
     const qrCode = await QRCode.toDataURL(verifyUrl);
 
     const certificate = await Certificate.create({

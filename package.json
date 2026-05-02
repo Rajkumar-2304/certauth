@@ -1,7 +1,11 @@
 {
-  "name": "certauth-functions",
+  "name": "certauth",
   "version": "1.0.0",
-  "description": "Netlify Functions for CertAuth backend",
+  "description": "CertAuth - Certificate Authentication Platform",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -19,5 +23,8 @@
     "serverless-http": "^3.2.0",
     "speakeasy": "^2.0.0",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }

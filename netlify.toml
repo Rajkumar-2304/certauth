@@ -1,28 +1,23 @@
 [build]
-  command = "cd frontend && npm install && npm run build"
+  # Install root deps (backend/function deps) first, then build frontend
+  command = "npm install && cd frontend && npm install && npm run build"
   publish = "frontend/build"
 
 [build.environment]
   NODE_VERSION = "18"
 
-# Serve the Netlify Function for all /api/* requests
+# Route all /api/* requests to the serverless function
 [[redirects]]
   from   = "/api/*"
   to     = "/.netlify/functions/api/:splat"
   status = 200
 
-# Serve uploads via function too
-[[redirects]]
-  from   = "/uploads/*"
-  to     = "/.netlify/functions/api/uploads/:splat"
-  status = 200
-
-# React Router — SPA fallback
+# React Router — SPA fallback (must be last)
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
   status = 200
 
 [functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+  directory      = "netlify/functions"
+  node_bundler   = "nft"
