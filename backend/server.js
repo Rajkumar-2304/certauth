@@ -21,7 +21,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 const allowedOrigins = [
-  process.env.FRONTEND_URL,                 // your Netlify URL (set in Render env vars)
+  process.env.CLIENT_URL,           // set in Render env vars → your Netlify URL
   'https://certauth-26.netlify.app',
   'http://localhost:3000'
 ].filter(Boolean);
