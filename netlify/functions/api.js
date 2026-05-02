@@ -17,11 +17,11 @@ app.use(rateLimit({
   validate: { xForwardedForHeader: false }
 }));
 
-// ── CORS ─────────────────────────────────────────────────────────
-// On Netlify: same domain = no CORS issues for production.
-// CLIENT_URL is still used for QR code verify URLs in certificates.
 app.use(cors({
-  origin: '*',   // same-domain on Netlify; lock down after confirming it works
+  origin: [
+    'https://certauthsgr.netlify.app',
+    'http://localhost:3000'
+  ],
   credentials: true
 }));
 
