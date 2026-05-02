@@ -20,12 +20,14 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
+const allowedOrigins = [
+  process.env.FRONTEND_URL,                 // your Netlify URL (set in Render env vars)
+  'https://certauth-26.netlify.app',
+  'http://localhost:3000'
+].filter(Boolean);
+
 app.use(cors({ 
-  origin: [
-    'https://certauth-26.netlify.app',
-    'https://certauth-lux4ldsaf-shreeyogas-projects.vercel.app',
-    'http://localhost:3000'
-  ],
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json({ limit: '50mb' }));
